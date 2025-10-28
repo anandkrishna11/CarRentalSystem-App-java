@@ -1,3 +1,4 @@
+package project;
 import javax.swing.*;
 import java.awt.*;
 import java.sql.*;
@@ -12,7 +13,6 @@ public class AdminPanel extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Tabs for Users and Vehicles
         JTabbedPane tabs = new JTabbedPane();
 
         usersTable = createUsersTable();
@@ -35,7 +35,6 @@ public class AdminPanel extends JFrame {
         add(tabs, BorderLayout.CENTER);
         add(btnPanel, BorderLayout.SOUTH);
 
-        // Button actions
         addVehicleBtn.addActionListener(e -> addVehicle());
         editVehicleBtn.addActionListener(e -> editVehicle());
         deleteVehicleBtn.addActionListener(e -> deleteVehicle());
@@ -46,7 +45,7 @@ public class AdminPanel extends JFrame {
 
     private JTable createUsersTable() {
         String[] columns = {"ID", "Username", "Email", "Password"};
-        Object[][] data = new Object[100][4]; // 100 rows max
+        Object[][] data = new Object[100][4];
         int row = 0;
 
         try (Connection con = CarRentalSystem.getConnection()) {
@@ -144,20 +143,20 @@ public class AdminPanel extends JFrame {
         }
 
         int id = Integer.parseInt(vehiclesTable.getValueAt(row, 0).toString());
-        String modelOld = vehiclesTable.getValueAt(row, 1).toString();
+        String statusOld = vehiclesTable.getValueAt(row, 6).toString();
 
-        String newModel = JOptionPane.showInputDialog(this, "Enter new model:", modelOld);
-        if (newModel != null && !newModel.isEmpty()) {
+        String newStatus = JOptionPane.showInputDialog(this, "Enter new status:", statusOld);
+        if (newStatus != null && !newStatus.isEmpty()) {
             try (Connection con = CarRentalSystem.getConnection()) {
-                String query = "UPDATE vehicle SET model=? WHERE id=?";
+                String query = "UPDATE vehicle SET status=? WHERE id=?";
                 PreparedStatement ps = con.prepareStatement(query);
-                ps.setString(1, newModel);
+                ps.setString(1, newStatus);
                 ps.setInt(2, id);
                 ps.executeUpdate();
-                JOptionPane.showMessageDialog(this, "Vehicle updated!");
+                JOptionPane.showMessageDialog(this, "Vehicle status updated!");
                 refreshPage();
             } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(this, "Error updating vehicle: " + ex.getMessage());
+                JOptionPane.showMessageDialog(this, "Error updating vehicle status: " + ex.getMessage());
             }
         }
     }
