@@ -1,7 +1,7 @@
+package project;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.*;
 import java.sql.*;
 
 public class BrowseVehicle extends JFrame {
@@ -25,13 +25,10 @@ public class BrowseVehicle extends JFrame {
         add(scrollPane, BorderLayout.CENTER);
 
         JPanel bottomPanel = new JPanel(new FlowLayout());
-        JButton rentBtn = new JButton("Rent Selected Vehicle");
         JButton refreshBtn = new JButton("Refresh");
-        bottomPanel.add(rentBtn);
         bottomPanel.add(refreshBtn);
         add(bottomPanel, BorderLayout.SOUTH);
 
-        rentBtn.addActionListener(e -> rentVehicle());
         refreshBtn.addActionListener(e -> loadVehicles());
 
         setVisible(true);
@@ -58,41 +55,6 @@ public class BrowseVehicle extends JFrame {
 
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error loading vehicles: " + ex.getMessage());
-        }
-    }
-
-    private void rentVehicle() {
-        int row = vehicleTable.getSelectedRow();
-        if (row == -1) {
-            JOptionPane.showMessageDialog(this, "Please select a vehicle to rent!");
-            return;
-        }
-
-        int vehicleId = (int) model.getValueAt(row, 0);
-        String modelName = (String) model.getValueAt(row, 1);
-        double pricePerDay = (double) model.getValueAt(row, 5);
-
-        int confirm = JOptionPane.showConfirmDialog(this,
-                "Do you want to rent " + modelName + " for ₹" + pricePerDay + " per day?",
-                "Confirm Rental", JOptionPane.YES_NO_OPTION);
-
-        if (confirm == JOptionPane.YES_OPTION) {
-            try (Connection con = CarRentalSystem.getConnection()) {
-                String update = "UPDATE vehicle SET status = 'Rented' WHERE id = ?";
-                PreparedStatement ps = con.prepareStatement(update);
-                ps.setInt(1, vehicleId);
-                int updated = ps.executeUpdate();
-
-                if (updated > 0) {
-                    JOptionPane.showMessageDialog(this, "Vehicle rented successfully!");
-                    loadVehicles();
-                } else {
-                    JOptionPane.showMessageDialog(this, "Error: Could not update vehicle status!");
-                }
-
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error renting vehicle: " + ex.getMessage());
-            }
         }
     }
 
